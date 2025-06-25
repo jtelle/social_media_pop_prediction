@@ -1,0 +1,67 @@
+# config.yaml
+
+paths:
+  raw_data_directory: '../data' # Path from src/ to data/
+  raw_data_filename: 'data.csv'
+  prepared_data_directory: './prepared_data' # Output directory for prepared data from data_preparation.py
+  models_directory: './models' # Output directory for trained models from model_training.py
+
+data_preparation:
+  log_transform_columns:
+    - 'shares'
+    - 'n_tokens_content'
+    - 'n_comments'
+    # New features to log transform for handling skewness:
+    - 'avg_words_per_link'
+    - 'avg_words_per_video'
+    - 'num_imgs_x_tokens'
+    # Add other numerical columns you want to log transform
+  numerical_imputation_columns:
+    - 'num_hrefs'
+    - 'num_self_hrefs'
+    - 'num_imgs'
+    - 'num_videos'
+    - 'self_reference_min_shares'
+    - 'self_reference_max_shares'
+    - 'self_reference_avg_shares'
+    # New features that might need imputation (e.g., from division by zero):
+    - 'avg_words_per_link'
+    - 'avg_words_per_video'
+    - 'num_imgs_x_tokens'
+    # 'data_channel' is handled separately as categorical imputation
+  categorical_encoding_columns:
+    - 'weekday'
+    - 'data_channel'
+  columns_to_drop_from_features:
+    - 'ID'
+    - 'URL'
+    # Add any other columns you want to exclude from features
+
+model_training:
+  test_size: 0.2
+  random_state: 42
+  n_splits: 3 # Number of folds for KFold cross-validation, used in tuning
+
+hyperparameter_tuning:
+  
+  search_method: random # 'grid' or 'random'
+  n_iter_random: 10 # Higher number will improve results but increase computation time
+  param_grid:
+    LinearRegression:
+      fit_intercept: [True, False]
+    #RandomForestRegressor:
+    # n_estimators: [100, 200]    # Reduced from 3 to 2 options
+    # max_depth: [10, 20]         # Reduced from 3 to 2 options (removed None for simplicity)
+    #  min_samples_split: [2, 5]   # Reduced from 3 to 2 options
+    #  min_samples_leaf: [1, 2]
+    XGBoostRegressor:
+      n_estimators: [200, 400, 600]
+      max_depth: [3, 5, 7, 9]
+      learning_rate: [0.01, 0.05, 0.1, 0.2]
+      subsample: [0.6, 0.8, 1.0]
+      colsample_bytree: [0.6, 0.8, 1.0]
+    GradientBoostingRegressor:
+      n_estimators: [100, 200, 300]
+      max_depth: [3, 5, 7]
+      learning_rate: [0.01, 0.1, 0.2]
+      subsample: [0.7, 0.9, 1.0]
