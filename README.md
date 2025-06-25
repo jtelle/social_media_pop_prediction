@@ -1,4 +1,3 @@
-# Jtelle-RegressionMiniProject
 python 3.11
 
 
